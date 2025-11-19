@@ -7,7 +7,6 @@ const {
 const AnalyticsController = {
   getPageInsights: async (req, res) => {
     try {
-      console.log("getPageInsights");
       const data = await getPageInsights();
       console.log("data", data);
       res.json(data);
@@ -24,7 +23,6 @@ const AnalyticsController = {
     }
   },
   getPostInsights: async (req, res) => {
-    console.log("getPostInsights", req.params);
     try {
       const { postId } = req.params;
       const data = await getPostInsights(postId);

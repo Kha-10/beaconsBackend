@@ -7,11 +7,14 @@ const fbApi = axios.create({
 const getPageInsights = async () => {
   try {
     const res = await fbApi.get(
-      `/${process.env.PAGE_ID}/insights?metric=page_post_engagements,page_follows,page_impressions&period=month&access_token=${process.env.ACCESS_TOKEN}`
+      `/${process.env.PAGE_ID}/insights?metric=page_post_engagements,page_follows,page_impressions_unique&period=days_28&access_token=${process.env.ACCESS_TOKEN}`
     );
     return res.data;
   } catch (error) {
-    console.error("Error fetching Facebook post data:", error.message);
+    console.error(
+      "Error fetching Facebook post data:",
+      error.response?.data?.error || error.message
+    );
     throw error;
   }
 };
@@ -43,13 +46,13 @@ const getPostInsights = async (postId) => {
       "comments.summary(true).order(reverse_chronological){message,from,created_time,comment_count}",
       "likes.summary(true)",
     ].join(",");
-
+    
     const res = await fbApi.get(
       `/${postId}?fields=${metrics}&access_token=${process.env.ACCESS_TOKEN}`
     );
     return res.data;
   } catch (error) {
-    console.error("Error fetching Facebook post data:", error.message);
+    console.error("Error fetching Facebook post data:",  error.response?.data?.error || error.message);
     throw error;
   }
 };
