@@ -4,6 +4,6 @@ const { body } = require("express-validator");
 
 const router = express.Router();
 
-router.get("/", UserController.index);
+router.post("/create-profile", UserController.createProfile);
 
 module.exports = router;

@@ -1,16 +1,29 @@
 const supabase = require("../config/supabase");
 
 const UserController = {
-  index: async (req, res) => {
+  createProfile: async (req, res) => {
     try {
-      console.log("i work");
+      const { id, email, name, avatar_url } = req.body;
 
-      const { data, error } = await supabase.from("users").select("*");
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", id)
+        .single();
 
-      if (error) throw error;
-      console.log("data", data);
+      if (existing) {
+        return res.json({ message: "Profile exists" });
+      }
 
-      res.json(data);
+      // Create profile
+      const user = await supabase.from("profiles").insert({
+        id,
+        email,
+        name,
+        avatar_url,
+      });
+
+      res.json({ message: user.data });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
