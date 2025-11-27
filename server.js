@@ -13,7 +13,6 @@ const morgan = require("morgan");
 const userRoutes = require("./routes/users");
 
 const analyticsRoutes = require("./routes/analytics");
-// const customerRoutes = require("./routes/customer");
 
 // const orderRoutes = require("./routes/orders");
 
@@ -78,7 +77,6 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", userRoutes);
 
 app.use("/api/v1/analytics", analyticsRoutes);
-
 // app.use("/api/stores/:storeId/products", authMiddleware, productRoutes);
 
 // app.use("/api/stores/:storeId/categories", authMiddleware, categoryRoutes);
