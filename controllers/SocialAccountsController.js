@@ -7,25 +7,25 @@ const {
 } = require("../services/socialAccounts");
 
 const SocialAccountController = {
-  get: async (req, res) => {
-    const { code, user_id, team_id } = req.body;
+  create: async (req, res) => {
+    const { userId } = req;
+    const { code, team_id } = req.body;
     const redirectUri = process.env.FACEBOOK_REDIRECT_URI;
+
     try {
-      if (!code || !user_id) {
+      if (!code || !userId) {
         return res.status(400).json({ error: "Missing code or user_id" });
       }
-      const tokenRes = await getUserAccessToken(code, redirectUri);
-      const shortLivedToken = tokenRes.data.access_token;
+      const shortLivedToken = await getUserAccessToken(code, redirectUri);
 
-      const longLivedRes = await getLongLivedUserToken(shortLivedToken);
-      const userAccessToken = longLivedRes.data.access_token;
+      const userAccessToken = await getLongLivedUserToken(shortLivedToken);
 
       const pagesRes = await getUserPages(userAccessToken);
 
       const pages = await Promise.all(
-        pagesRes.data.data.map(async (page) => {
+        pagesRes.map(async (page) => {
           const debugRes = await checkTokenExpiration(page.access_token);
-          const expires_at = debugRes.data.data.expires_at;
+          const expires_at = debugRes;
 
           const { data: existing } = await supabase
             .from("social_accounts")
@@ -34,8 +34,8 @@ const SocialAccountController = {
             .single();
 
           if (!existing) {
-            await supabase.from("social_accounts").insert({
-              user_id,
+            let res = await supabase.from("social_accounts").insert({
+              user_id: userId,
               team_id: team_id || null,
               platform: "facebook",
               platform_account_id: page.id,
@@ -46,6 +46,10 @@ const SocialAccountController = {
               token_expires_at: expires_at,
               is_connected: true,
             });
+            console.log("res", res);
+            if (res.error) {
+              throw new Error("Error inserting social account:", res.error);
+            }
           }
 
           return {

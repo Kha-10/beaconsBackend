@@ -56,24 +56,6 @@ app.get("/", (req, res) => {
   return res.json({ hello: "world" });
 });
 
-// CREATE - Add new record
-// app.post("/users", async (req, res) => {
-//   try {
-//     const { name, email } = req.body;
-
-//     const { data, error } = await supabase
-//       .from("users")
-//       .insert([{ name, email }])
-//       .select();
-
-//     if (error) throw error;
-
-//     res.status(201).json(data);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// });
-
 app.use("/api/v1/auth", userRoutes);
 
 app.use("/api/v1/analytics", analyticsRoutes);
