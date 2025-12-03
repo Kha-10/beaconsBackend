@@ -45,8 +45,8 @@ async function checkTokenExpiration(pageToken) {
       access_token: `${process.env.FACEBOOK_APP_ID}|${process.env.FACEBOOK_APP_SECRET}`,
     },
   });
-  const expiresAtUnix = res.data.data.expires_at;
-
+  const expiresAtUnix = res.data.data.data_access_expires_at;
+  
   if (expiresAtUnix === 0) {
     return null;
   }

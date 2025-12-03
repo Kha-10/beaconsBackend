@@ -1,37 +1,37 @@
-const axios = require("axios");
+const fbApi = require("../config/facebook");
 
-const fbApi = axios.create({
-  baseURL: "https://graph.facebook.com/v24.0",
-});
-
-const getPageInsights = async () => {
+const getPageInsights = async (token) => {
   try {
     const res = await fbApi.get(
-      `/${process.env.PAGE_ID}/insights?metric=page_post_engagements,page_follows,page_impressions_unique&period=days_28&access_token=${process.env.ACCESS_TOKEN}`
+      `/${process.env.PAGE_ID}/insights?metric=page_post_engagements,page_follows,page_impressions_unique&period=days_28&access_token=${token}`
     );
     return res.data;
   } catch (error) {
-    console.error(
-      "Error fetching Facebook post data:",
-      error.response?.data?.error || error.message
+    const err = new Error(
+      error.response?.data?.error?.message || "Failed fetching page insights"
     );
-    throw error;
+    err.status = error.response?.status;
+    throw err;
   }
 };
 
-const getPostId = async () => {
+const getPostId = async (token) => {
   try {
     const res = await fbApi.get(
-      `/${process.env.PAGE_ID}/published_posts?access_token=${process.env.ACCESS_TOKEN}`
+      `/${process.env.PAGE_ID}/published_posts?access_token=${token}`
     );
     return res.data;
   } catch (error) {
     console.error("Error fetching Facebook post data:", error.message);
-    throw error;
+    const err = new Error(
+      error.response?.data?.error?.message || "Failed fetching post data"
+    );
+    err.status = error.response?.status;
+    throw err;
   }
 };
 
-const getPostInsights = async (postId) => {
+const getPostInsights = async (postId, token) => {
   try {
     const metrics = [
       "id",
@@ -46,14 +46,21 @@ const getPostInsights = async (postId) => {
       "comments.summary(true).order(reverse_chronological){message,from,created_time,comment_count}",
       "likes.summary(true)",
     ].join(",");
-    
+
     const res = await fbApi.get(
-      `/${postId}?fields=${metrics}&access_token=${process.env.ACCESS_TOKEN}`
+      `/${postId}?fields=${metrics}&access_token=${token}`
     );
     return res.data;
   } catch (error) {
-    console.error("Error fetching Facebook post data:",  error.response?.data?.error || error.message);
-    throw error;
+    console.error(
+      "Error fetching Facebook post data:",
+      error.response?.data?.error || error.message
+    );
+    const err = new Error(
+      error.response?.data?.error?.message || "Failed fetching post data"
+    );
+    err.status = error.response?.status;
+    throw err;
   }
 };
 
